@@ -3,20 +3,41 @@ import CardItem from "./Card";
 import { Button } from "@nextui-org/react";
 import { Plus } from "lucide-react";
 import { GlobalContext } from "../context/GlobalContext";
-import ModalForm from './ModalForm';
+import ModalForm from "./ModalForm";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const Cards = () => {
-  const { historias, setDataHistòria, agregarHistoria, editarHistoria, dataHistòria } = useContext(GlobalContext);
+  const { historias, setDataHistòria, agregarHistoria, editarHistoria, borrarHistoria, dataHistòria } = useContext(GlobalContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const MySwal = withReactContent(Swal);
 
   const handleEdit = (historia) => {
     setDataHistòria(historia);
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    console.log("ID de la historia a borrar:", id);
-    // Aquí se añadirá la lógica para borrar la historia de la base de datos
+  const handleDelete = async (id) => {
+    MySwal.fire({
+      title: 'Estas Seguro ?',
+      text: "",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        console.log("ID de la historia a borrar:", id);
+        await borrarHistoria(id);
+        MySwal.fire(
+          'Borrado!',
+          'La histora esta eliminada.',
+          'success'
+        );
+      }
+    });
   };
 
   const handleClose = () => {
