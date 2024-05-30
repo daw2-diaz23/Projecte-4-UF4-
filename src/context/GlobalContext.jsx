@@ -30,16 +30,45 @@ export const GlobalProvider = ({ children }) => {
         fetchHistorias();
     }, []);
 
-    const agregarHistoria = (historia) => {
-        setHistorias(prev => [...prev, { ...historia, id: Date.now() }]);
+    const agregarHistoria = async (historia) => {
+        try {
+            const response = await fetch('http://localhost:3000/historias', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(historia)
+            });
+            if (!response.ok) {
+                throw new Error('Error al agregar la historia');
+            }
+            const nuevaHistoria = await response.json();
+            setHistorias(prev => [...prev, nuevaHistoria]);
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
     const editarHistoria = (id, historiaActualizada) => {
         setHistorias(prev => prev.map(hist => hist.id === id ? historiaActualizada : hist));
     };
 
+    const borrarHistoria = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:3000/historias/${id}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error('Error al borrar la historia');
+            }
+            setHistorias(prev => prev.filter(hist => hist.id !== id));
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
     return (
-        <GlobalContext.Provider value={{ historias, agregarHistoria, editarHistoria, dataHistòria, setDataHistòria, loading, error }}>
+        <GlobalContext.Provider value={{ historias, agregarHistoria, editarHistoria, borrarHistoria, dataHistòria, setDataHistòria, loading, error }}>
             {children}
         </GlobalContext.Provider>
     );
