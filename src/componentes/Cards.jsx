@@ -3,9 +3,9 @@ import CardItem from "./Card";
 import { Button } from "@nextui-org/react";
 import { Plus } from "lucide-react";
 import { GlobalContext } from "../context/GlobalContext";
-import ModalForm from "./ModalForm";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+import ModalForm from './ModalForm';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
 const Cards = () => {
   const { historias, setDataHistòria, agregarHistoria, editarHistoria, borrarHistoria, dataHistòria } = useContext(GlobalContext);
@@ -20,20 +20,20 @@ const Cards = () => {
 
   const handleDelete = async (id) => {
     MySwal.fire({
-      title: 'Estas Seguro ?',
-      text: "",
+      title: 'Estàs segur?',
+      text: "No podràs revertir això!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Si'
+      confirmButtonText: 'Sí, esborra-ho!'
     }).then(async (result) => {
       if (result.isConfirmed) {
         console.log("ID de la historia a borrar:", id);
         await borrarHistoria(id);
         MySwal.fire(
-          'Borrado!',
-          'La histora esta eliminada.',
+          'Esborrat!',
+          'La història ha estat esborrada.',
           'success'
         );
       }
@@ -45,11 +45,11 @@ const Cards = () => {
     setIsModalOpen(false);
   };
 
-  const handleSave = (data) => {
+  const handleSave = async (data) => {
     if (data.id) {
-      editarHistoria(data.id, data);
+      await editarHistoria(data.id, data);
     } else {
-      agregarHistoria(data);
+      await agregarHistoria(data);
     }
     handleClose();
   };
