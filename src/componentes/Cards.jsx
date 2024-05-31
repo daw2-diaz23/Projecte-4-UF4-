@@ -4,14 +4,10 @@ import { Button } from "@nextui-org/react";
 import { Plus } from "lucide-react";
 import { GlobalContext } from "../context/GlobalContext";
 import ModalForm from './ModalForm';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
 
 const Cards = () => {
-  const { historias, setDataHistòria, agregarHistoria, editarHistoria, borrarHistoria, dataHistòria } = useContext(GlobalContext);
+  const { historias, setDataHistòria, agregarHistoria, editarHistoria, eliminarHistoria, loading, error } = useContext(GlobalContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const MySwal = withReactContent(Swal);
 
   const handleEdit = (historia) => {
     setDataHistòria(historia);
@@ -19,25 +15,11 @@ const Cards = () => {
   };
 
   const handleDelete = async (id) => {
-    MySwal.fire({
-      title: 'Estàs segur?',
-      text: "No podràs revertir això!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, esborra-ho!'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        console.log("ID de la historia a borrar:", id);
-        await borrarHistoria(id);
-        MySwal.fire(
-          'Esborrat!',
-          'La història ha estat esborrada.',
-          'success'
-        );
-      }
-    });
+    try {
+      await eliminarHistoria(id);
+    } catch (err) {
+      console.error("Error al borrar la historia:", err);
+    }
   };
 
   const handleClose = () => {
@@ -46,18 +28,30 @@ const Cards = () => {
   };
 
   const handleSave = async (data) => {
-    if (data.id) {
-      await editarHistoria(data.id, data);
-    } else {
-      await agregarHistoria(data);
+    try {
+      if (data.id) {
+        await editarHistoria(data.id, data);
+      } else {
+        await agregarHistoria(data);
+      }
+      handleClose();
+    } catch (err) {
+      console.error("Error al guardar la historia:", err);
     }
-    handleClose();
   };
 
   const onOpen = () => {
     setDataHistòria(null); // Restablece dataHistòria para un nuevo formulario
     setIsModalOpen(true);
   };
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
