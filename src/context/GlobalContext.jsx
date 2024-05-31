@@ -11,7 +11,7 @@ export const GlobalProvider = ({ children }) => {
     useEffect(() => {
         const fetchHistorias = async () => {
             try {
-                const response = await fetch('http://localhost:3000/historias');
+                const response = await fetch('https://json-server-1t2d.vercel.app/historias');
                 console.log('Response status:', response.status); // Verifica la respuesta
                 if (!response.ok) {
                     throw new Error('Error al cargar las historias');
@@ -32,58 +32,58 @@ export const GlobalProvider = ({ children }) => {
 
     const agregarHistoria = async (historia) => {
         try {
-            const response = await fetch('http://localhost:3000/historias', {
+            const response = await fetch('https://json-server-1t2d.vercel.app/historias', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(historia)
+                body: JSON.stringify(historia),
             });
             if (!response.ok) {
                 throw new Error('Error al agregar la historia');
             }
-            const nuevaHistoria = await response.json();
-            setHistorias(prev => [...prev, nuevaHistoria]);
+            const newHistoria = await response.json();
+            setHistorias(prev => [...prev, newHistoria]);
         } catch (err) {
-            setError(err.message);
+            throw err;
         }
     };
 
     const editarHistoria = async (id, historiaActualizada) => {
         try {
-            const response = await fetch(`http://localhost:3000/historias/${id}`, {
+            const response = await fetch(`https://json-server-1t2d.vercel.app/historias/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(historiaActualizada)
+                body: JSON.stringify(historiaActualizada),
             });
             if (!response.ok) {
                 throw new Error('Error al editar la historia');
             }
-            const data = await response.json();
-            setHistorias(prev => prev.map(hist => hist.id === id ? data : hist));
+            const updatedHistoria = await response.json();
+            setHistorias(prev => prev.map(hist => hist.id === id ? updatedHistoria : hist));
         } catch (err) {
-            setError(err.message);
+            throw err;
         }
     };
 
-    const borrarHistoria = async (id) => {
+    const eliminarHistoria = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3000/historias/${id}`, {
+            const response = await fetch(`https://json-server-1t2d.vercel.app/historias/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
                 throw new Error('Error al borrar la historia');
             }
-            setHistorias(prev => prev.filter(hist => hist.id !== id));
+            setHistorias(prev => prev.filter(historia => historia.id !== id));
         } catch (err) {
-            setError(err.message);
+            throw err;
         }
     };
 
     return (
-        <GlobalContext.Provider value={{ historias, agregarHistoria, editarHistoria, borrarHistoria, dataHistòria, setDataHistòria, loading, error }}>
+        <GlobalContext.Provider value={{ historias, agregarHistoria, editarHistoria, eliminarHistoria, dataHistòria, setDataHistòria, loading, error }}>
             {children}
         </GlobalContext.Provider>
     );
